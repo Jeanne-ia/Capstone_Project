@@ -1,0 +1,14 @@
+{
+  "t_low": 0.350906664671319,
+  "t_high": 0.6018133293426379,
+  "best_threshold": 0.6018133293426379,
+  "feature_cols": [
+    "avg_correct",
+    "max_correct",
+    "avg_wrong",
+    "max_wrong",
+    "kw_recall",
+    "kw_precision",
+    "kw_f1"
+  ]
+}
