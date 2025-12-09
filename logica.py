@@ -145,7 +145,7 @@ def generar_feedback_genai(pregunta, student_answer, interpretacion, referencia,
     except:
         return "⚠️ Error: No se encontró la GEMINI_API_KEY en los secretos.", "Error"
 
-    client = genai.Client(api_key=api_key)
+    client = genai.Client(api_key="AIzaSyAiTMig8Tf8zy09zMw5DmREauuC68l4RlA")
     
     prompt = f"""
     Actúa como profesor de Deep Learning.
