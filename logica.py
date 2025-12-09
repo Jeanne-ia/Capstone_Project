@@ -140,11 +140,8 @@ def interpretar_3clases(score):
 
 def generar_feedback_genai(pregunta, student_answer, interpretacion, referencia, hint):
     # Intentamos obtener la API KEY de los secretos de Streamlit
-    try:
-        api_key = st.secrets["GEMINI_API_KEY"]
-    except:
-        return "⚠️ Error: No se encontró la GEMINI_API_KEY en los secretos.", "Error"
-
+    
+    api_key = "AIzaSyC4tRNxxmORfGz9iiO_b0Pn5-xd7BEB2us"
     client = genai.Client(api_key=api_key)
     
     prompt = f"""
