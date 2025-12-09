@@ -141,7 +141,7 @@ def interpretar_3clases(score):
 def generar_feedback_genai(pregunta, student_answer, interpretacion, referencia, hint):
     # Intentamos obtener la API KEY de los secretos de Streamlit
     
-    api_key = "AIzaSyC4tRNxxmORfGz9iiO_b0Pn5-xd7BEB2us"
+    api_key = st.secrets["GEMINI_API_KEY"]
     client = genai.Client(api_key=api_key)
     
     prompt = f"""
