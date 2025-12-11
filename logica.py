@@ -6,6 +6,7 @@ import json
 import joblib
 import nltk
 from nltk.corpus import stopwords
+from collections import Counter
 from sentence_transformers import SentenceTransformer, util
 from sklearn.metrics.pairwise import cosine_similarity
 from google import genai
@@ -43,8 +44,6 @@ def cargar_dataset():
     try:
         # Intentamos cargar el CSV
         df = pd.read_csv("Dataset_preguntas_v1.csv")
-        if "KEYWORDS" not in df.columns or df["KEYWORDS"].isna().any():
-            df = compute_all_keywords(df, top_k=10, threshold=0.2)
         return df
     except FileNotFoundError:
         return pd.DataFrame() # Retorna vacío si falla
@@ -133,7 +132,7 @@ def compute_all_keywords(df, top_k=10, threshold=0.2):
         return [w for w in kws if w not in auto_global_stopwords]
 
     df["KEYWORDS"] = df["KEYWORDS_SBERT"].apply(filter_stopwords)
-    df_preguntas.drop('KEYWORDS_SBERT', axis=1, inplace=True)
+    df.drop('KEYWORDS_SBERT', axis=1, inplace=True)
     return df
 
 def get_keyword_coverage(student_answer, keywords):
