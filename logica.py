@@ -29,7 +29,7 @@ def cargar_modelo_sbert():
 
 @st.cache_resource
 def cargar_recursos_ml():
-    # Asumimos que los archivos están en la misma carpeta que este script
+    # Archivos están en la misma carpeta
     try:
         model_kw = joblib.load("model_kw.joblib")
         with open("params_kw.json") as f:
@@ -53,12 +53,12 @@ model_kw, params = cargar_recursos_ml()
 
 # Extraer parámetros si cargaron bien
 if params:
-    t_low = params.get("t_low", 0.3)
-    t_high = params.get("t_high", 0.7)
-    features = params.get("feature_cols", [])
+    t_low = params.get("t_low", 0.3509)
+    t_high = params.get("t_high", 0.6018)
+    features = params.get("feature_cols", ['avg_correct', 'max_correct', 'avg_wrong', 'max_wrong', 'kw_recall', 'kw_precision', 'kw_f1'])
 else:
     # Valores por defecto por si falla la carga
-    t_low, t_high, features = 0.3, 0.7, []
+    t_low, t_high, features = 0.3509, 0.6018, ['avg_correct', 'max_correct', 'avg_wrong', 'max_wrong', 'kw_recall', 'kw_precision', 'kw_f1']
 
 # --- FUNCIONES DE LÓGICA ---
 
@@ -127,7 +127,7 @@ def get_semantic_similarity(model_correct, model_wrong, student_answer, keywords
     return base
 
 def scorer_logreg_kw(row):
-    if model_kw is None: return 0.5 # Fallback si no hay modelo
+    if model_kw is None: return 0.0 # Fallback si no hay modelo
     linear = model_kw.intercept_[0]
     for coef, feat in zip(model_kw.coef_[0], features):
         linear += coef * row.get(feat, 0)
@@ -145,19 +145,72 @@ def generar_feedback_genai(pregunta, student_answer, interpretacion, referencia,
     client = genai.Client(api_key=api_key)
     
     prompt = f"""
-    Actúa como profesor de Deep Learning.
-    Pregunta: {pregunta}
-    Respuesta alumno: {student_answer}
-    Clasificación modelo: {interpretacion}
-    Referencia: {referencia}
-    Pista: {hint}
-    
-    Dame un feedback breve (max 3 líneas), en segunda persona, constructivo. 
-    Si es correcta, felicita y matiza. Si es incorrecta, explica el error sin juzgar.
-    """
-    
-    try:
-        resp = client.models.generate_content(model="gemini-2.0-flash", contents=prompt)
-        return resp.text.strip(), "gemini-2.0-flash"
-    except Exception as e:
-        return f"No se pudo generar feedback IA. Error: {str(e)}", "Error"
+            Eres profesor de un máster en Deep Learning y corriges preguntas abiertas de teoría.
+            
+            Tu tarea:
+            Escribe un feedback breve y personalizado (máximo 3 líneas) sobre la respuesta del estudiante, en español.
+            
+            Contexto:
+            - Pregunta del examen:
+            {pregunta}
+            
+            - Respuesta del estudiante:
+            {student_answer}
+            
+            - Clasificación automática de la respuesta (CORRECTA, INCORRECTA, REVISAR_PROFESOR):
+            {interpretacion}
+            
+            - Respuestas de referencia del profesor:
+            {referencia}
+            
+            - Pista o hint para el alumno:
+            {hint}
+            
+            Instrucciones generales:
+            - Habla siempre en segunda persona (por ejemplo: "tu respuesta...").
+            - No repitas la pregunta ni copies literalmente la respuesta de referencia.
+            - No menciones que eres un modelo de lenguaje ni al sistema automático.
+            - Mantén un tono claro, cercano y motivador.
+            
+            Reglas según la clasificación:
+            - Si la clasificación es CORRECTA:
+              - Comienza con una breve felicitación.
+              - Señala un punto fuerte concreto de la respuesta.
+              - Sugiere una idea para profundizar o matizar.
+            
+            - Si la clasificación es INCORRECTA:
+              - Usa un tono constructivo, sin juicios duros.
+              - Explica qué concepto importante falta, está confuso o es erróneo.
+              - Sugiere 1–2 acciones claras para mejorar (qué revisar o cómo reformular).
+            
+            - Si la clasificación es REVISAR:
+              - Indica que la respuesta debe ser revisada por un profesor humano.
+              - Menciona brevemente un aspecto que parece bien encaminado y otro que genera duda o ambigüedad.
+              - Invita al estudiante a revisar los conceptos clave relacionados con la pregunta.
+            
+            Formato de salida:
+            Devuelve solo el texto del feedback, en un único párrafo de máximo 3–4 líneas, sin listas, encabezados ni emojis.
+            """
+
+    MODELOS = ["gemini-2.0-flash", "gemini-2.0-flash-lite"]
+    for modelo in MODELOS:
+        try:
+            resp = client.models.generate_content(model=modelo,contents=prompt,)
+            feedback = resp.text.strip()
+            return feedback, modelo
+        except Exception as e:
+            msg = str(e).lower()
+            # Por si hay error de rate limit
+            if ("rate" in msg and "limit" in msg) or "429" in msg or "resourceexhausted" in msg:
+                ultimo_error = e
+                continue  # intenta con el siguiente modelo
+            ultimo_error = e
+            break
+    # Feedback "humano" neutro en lugar del traceback de ERROR
+    feedback_fallback = (
+        "Por ahora no pude generar feedback automático. "
+        "Revisa tu respuesta comparando los conceptos clave vistos en clase "
+        "y las pistas proporcionadas."
+    )
+
+    return feedback_fallback, "ERROR"
