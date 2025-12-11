@@ -43,6 +43,8 @@ def cargar_dataset():
     try:
         # Intentamos cargar el CSV
         df = pd.read_csv("Dataset_preguntas_v1.csv")
+        if "KEYWORDS" not in df.columns or df["KEYWORDS"].isna().any():
+            df = compute_all_keywords(df, top_k=10, threshold=0.2)
         return df
     except FileNotFoundError:
         return pd.DataFrame() # Retorna vacío si falla
