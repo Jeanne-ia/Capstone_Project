@@ -1,12 +1,12 @@
 import streamlit as st
 import pandas as pd
-import logica  # Importamos tu archivo de lógica limpio
+import logica #Archivo con la lógica de EvalIA
 import ast
 
 # --- CONFIGURACIÓN DE PÁGINA ---
 st.set_page_config(page_title="EvalIA - Capstone", layout="wide")
 
-# --- CSS PERSONALIZADO (Opcional, para que se vea bonito) ---
+# --- CSS ---
 st.markdown("""
 <style>
     .stTextArea textarea { font-size: 16px; }
