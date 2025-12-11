@@ -4,7 +4,7 @@ import logica #Archivo con la lógica de EvalIA
 import ast
 
 # --- CONFIGURACIÓN DE PÁGINA ---
-st.set_page_config(page_title="EvalIA - Capstone", layout="wide")
+st.set_page_config(page_title="EvalIA - App", layout="wide")
 
 # --- CSS ---
 st.markdown("""
@@ -22,7 +22,7 @@ if 'df_preguntas' not in st.session_state:
     st.session_state['df_preguntas'] = logica.cargar_dataset()
 
 # --- HEADER ---
-st.title("🧪 EvalIA: Sistema de Evaluación Continua")
+st.title("🎓 EvalIA: Sistema de Evaluación Continua")
 st.markdown("Capstone Project | Evaluación automática de respuestas abiertas con **SBERT + Regresión Logística + GenAI**.")
 
 # --- BARRA LATERAL (SIDEBAR) ---
