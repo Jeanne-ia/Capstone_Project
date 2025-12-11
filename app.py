@@ -126,8 +126,8 @@ if 'last_result' in st.session_state:
                 
     with col2:
         st.markdown("### 📈 Métricas Técnicas")
-        st.metric("Similitud Correcta", f"{res['metrics']['max_correct']:.2f}")
-        st.metric("Similitud Incorrecta", f"{res['metrics']['max_wrong']:.2f}")
+        st.metric("Similitud con respuestas CORRECTAS", f"{res['metrics']['max_correct']:.2f}")
+        st.metric("Similitud con respuestas INCORRECTAS", f"{res['metrics']['max_wrong']:.2f}")
         st.metric("Uso de Keywords (F1)", f"{res['metrics']['kw_f1']:.2f}")
 
 else:
