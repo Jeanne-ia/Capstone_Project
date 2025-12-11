@@ -6,7 +6,6 @@ import json
 import joblib
 import nltk
 from nltk.corpus import stopwords
-from collections import Counter
 from sentence_transformers import SentenceTransformer, util
 from sklearn.metrics.pairwise import cosine_similarity
 from google import genai
@@ -76,64 +75,6 @@ def parse_list(x):
         return ast.literal_eval(x) if isinstance(x, str) else x
     except Exception:
         return [x]
-        
-# Función para extraer palabras clave
-def compute_all_keywords(df, top_k=10, threshold=0.2):
-    # Keywords candidatos ordenadas por SBERT
-    def keybert_like_keywords(ANSWER_LST, top_k=10):
-        if not isinstance(ANSWER_LST, str):
-            return []
-        try:
-            parsed = ast.literal_eval(ANSWER_LST)
-            sentences = parsed if isinstance(parsed, list) else [parsed]
-        except Exception:
-            sentences = [ANSWER_LST]
-
-        text = " ".join(sentences)
-        clean = preprocess_text(text)
-
-        words = [
-            w for w in clean.split()
-            if w not in spanish_stopwords and len(w) > 2
-        ]
-        if not words:
-            return []
-
-        candidates = sorted(set(words))
-
-        doc_emb = model_sbert.encode([clean])
-        cand_embs = model_sbert.encode(candidates)
-
-        sims = cosine_similarity(doc_emb, cand_embs)[0]
-        idx_sorted = sims.argsort()[::-1]
-        top_idx = idx_sorted[:top_k]
-
-        return [candidates[i] for i in top_idx]
-
-    # Calcular KEYWORDS_SBERT para cada pregunta
-    df["KEYWORDS_SBERT"] = df["ANSWER_CORRECT"].apply(
-        lambda txt: keybert_like_keywords(txt, top_k=top_k)
-    )
-
-    # Calcular keywords globales
-    df_counts = Counter()
-    n_docs = len(df)
-
-    for kws in df["KEYWORDS_SBERT"]:
-        for w in set(kws):
-            df_counts[w] += 1
-
-    auto_global_stopwords = {
-        w for w, c in df_counts.items() if c / n_docs > threshold
-    }
-
-    # Filtrar palabras globales
-    def filter_stopwords(kws):
-        return [w for w in kws if w not in auto_global_stopwords]
-
-    df["KEYWORDS"] = df["KEYWORDS_SBERT"].apply(filter_stopwords)
-    df.drop('KEYWORDS_SBERT', axis=1, inplace=True)
-    return df
 
 def get_keyword_coverage(student_answer, keywords):
     kw_set = set(keywords or [])
