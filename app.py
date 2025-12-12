@@ -145,7 +145,7 @@ st.divider()
 # --- PERFILES DIFERENCIADOS ---
 if st.session_state['role'] == "teacher":
     # ========== PERFIL DOCENTE ==========
-    st.markdown("## 👨‍🏫 Panel del Docente")
+    st.markdown("## 👨‍🏫 Centro de Inteligencia Pedagógica")
     
     tab1, tab2, tab3 = st.tabs(["📝 Evaluar Preguntas", "📊 Estadísticas", "⚙️ Gestión"])
     
@@ -156,7 +156,7 @@ if st.session_state['role'] == "teacher":
             df = st.session_state['df_preguntas']
             preguntas_disponibles = df['QUESTION'].tolist()
             
-            st.subheader("Control de Pregunta")
+            st.subheader("Elije r")
 
             pregunta_elegida_texto = st.selectbox(
                 "Seleccione una pregunta para evaluar:",
@@ -243,7 +243,7 @@ if st.session_state['role'] == "teacher":
             col1, col2 = st.columns([2, 1])
             
             with col1:
-                st.markdown("### 🤖 Feedback IA")
+                st.markdown("### 🤖 Guía Personalizada de Aprendizaje")
                 st.info(res['feedback'])
                 
                 with st.expander("Ver respuesta de referencia (Docente)"):
@@ -375,7 +375,7 @@ else:
             st.markdown(f"### {fila['QUESTION']}")
             
             with st.form("eval_form_student"):
-                respuesta_usuario = st.text_area("Tu respuesta:", height=150, placeholder="Escribe aquí tu explicación...")
+                respuesta_usuario = st.text_area("Validación del pensamiento crítico:", height=150, placeholder="Escribe aquí tu explicación...")
                 submitted = st.form_submit_button("📤 Enviar Respuesta")
                 
             if submitted:
