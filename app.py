@@ -76,7 +76,7 @@ def login_page():
     col1, col2, col3 = st.columns([1, 2, 1])
     
     with col2:
-        st.subheader("🔐 Login")
+        st.subheader("🔐 Acceso")
         
         username = st.text_input("Usuario")
         password = st.text_input("Contraseña", type="password")
@@ -104,7 +104,7 @@ def login_page():
                 st.rerun()
         
         st.divider()
-        st.info("**¿Eres nuevo?** Haz clic en 'Registrarse'")
+        st.info("**Usuarios de prueba:**\n\n**Profesor:** teacher / teacher123\n\n**Estudiantes:**\n- student1 / student123 (Juan)\n\n**¿Eres nuevo?** Haz clic en 'Registrarse'")
 
 def logout():
     for key in list(st.session_state.keys()):
@@ -134,7 +134,7 @@ if 'df_preguntas' not in st.session_state:
 col_header1, col_header2 = st.columns([4, 1])
 
 with col_header1:
-    st.markdown("<h1 style='text-align: center;'>🎓 EvalIA: Sistema de Evaluación Continua</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style='text-align: center;'>🎓 Sistema de Evaluación Continua</h1>", unsafe_allow_html=True)
     role_emoji = "👨‍🏫" if st.session_state['role'] == "teacher" else "👨‍🎓"
     st.markdown(f"<p style='text-align: center;'>{role_emoji} Bienvenido, <strong>{st.session_state['name']}</strong> | Capstone Project - Evaluación automática de respuestas.</p>", unsafe_allow_html=True)
 
@@ -376,6 +376,10 @@ else:
             st.subheader(f"Pregunta {fila['QUESTION_ID']}")
             st.markdown(f"### {fila['QUESTION']}")
             
+            # Mostrar pista ANTES del formulario
+            with st.expander("💡 Ver pista"):
+                st.write(fila["HINT"])
+            
             with st.form("eval_form_student"):
                 respuesta_usuario = st.text_area("Validación del pensamiento crítico:", height=150, placeholder="Escribe aquí tu explicación...")
                 submitted = st.form_submit_button("📤 Enviar Respuesta")
@@ -445,9 +449,14 @@ else:
             st.markdown("### 🤖 Guía Personalizada de Aprendizaje")
             st.info(res['feedback'])
             
-            # Los estudiantes NO ven las métricas técnicas ni la respuesta de referencia
-            with st.expander("💡 Ver pista"):
-                st.write(res['hint'])
+            # Mostrar la respuesta del profesor después del feedback
+            st.markdown("### 📚 Respuesta del Docente")
+            with st.expander("Ver respuesta de referencia"):
+                try:
+                    refs = ast.literal_eval(res['referencia']) if isinstance(res['referencia'], str) else res['referencia']
+                    st.write(refs[0] if isinstance(refs, list) and len(refs)>0 else str(refs))
+                except:
+                    st.write(res['referencia'])
     
     with tab2:
         st.subheader("📊 Tu Historial de Respuestas")
