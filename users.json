@@ -1,0 +1,22 @@
+{
+  "teacher": {
+    "password": "teacher123",
+    "role": "teacher",
+    "name": "Profesor"
+  },
+  "student1": {
+    "password": "student123",
+    "role": "student",
+    "name": "Juan Pérez"
+  },
+  "student2": {
+    "password": "student456",
+    "role": "student",
+    "name": "María García"
+  },
+  "student3": {
+    "password": "student789",
+    "role": "student",
+    "name": "Carlos López"
+  }
+}
