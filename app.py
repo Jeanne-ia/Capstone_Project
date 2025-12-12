@@ -2,9 +2,10 @@ import streamlit as st
 import pandas as pd
 import logica #Archivo con la lógica de EvalIA
 import ast
-import json
-import os
 from datetime import datetime
+
+# Import database functions
+import database as db
 
 # --- CONFIGURACIÓN DE PÁGINA ---
 st.set_page_config(page_title="EvalIA - App", layout="wide")
@@ -22,77 +23,8 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# --- USUARIOS (En producción, usar base de datos) ---
-USERS = {
-    "teacher": {"password": "teacher123", "role": "teacher", "name": "Profesor"},
-    "student1": {"password": "student123", "role": "student", "name": "Juan Pérez"},
-    "student2": {"password": "student456", "role": "student", "name": "María García"},
-    "student3": {"password": "student789", "role": "student", "name": "Carlos López"}
-}
-
-# --- ARCHIVO DE ALMACENAMIENTO PERSISTENTE ---
-SUBMISSIONS_FILE = "student_submissions.json"
-USERS_FILE = "users.json"
-
-# --- FUNCIONES DE GESTIÓN DE USUARIOS ---
-def load_users():
-    """Carga usuarios desde archivo, si existe. Si no, usa los usuarios por defecto"""
-    if os.path.exists(USERS_FILE):
-        try:
-            with open(USERS_FILE, 'r', encoding='utf-8') as f:
-                return json.load(f)
-        except:
-            return USERS.copy()
-    else:
-        # Primera vez: guardar usuarios por defecto
-        save_users(USERS)
-        return USERS.copy()
-
-def save_users(users_dict):
-    """Guarda usuarios en archivo JSON"""
-    with open(USERS_FILE, 'w', encoding='utf-8') as f:
-        json.dump(users_dict, f, ensure_ascii=False, indent=2)
-
-def register_user(username, password, name):
-    """Registra un nuevo estudiante"""
-    users = load_users()
-    if username in users:
-        return False, "El usuario ya existe"
-    
-    users[username] = {
-        "password": password,
-        "role": "student",
-        "name": name
-    }
-    save_users(users)
-    return True, "Registro exitoso"
-
-# --- FUNCIONES DE PERSISTENCIA ---
-def load_submissions():
-    """Carga todas las respuestas de estudiantes desde el archivo JSON"""
-    if os.path.exists(SUBMISSIONS_FILE):
-        try:
-            with open(SUBMISSIONS_FILE, 'r', encoding='utf-8') as f:
-                return json.load(f)
-        except:
-            return []
-    return []
-
-def save_submission(submission):
-    """Guarda una nueva respuesta de estudiante"""
-    submissions = load_submissions()
-    submissions.append(submission)
-    with open(SUBMISSIONS_FILE, 'w', encoding='utf-8') as f:
-        json.dump(submissions, f, ensure_ascii=False, indent=2)
-
-def get_student_submissions(username):
-    """Obtiene todas las respuestas de un estudiante específico"""
-    all_submissions = load_submissions()
-    return [s for s in all_submissions if s.get('username') == username]
-
-def get_all_submissions():
-    """Obtiene todas las respuestas de todos los estudiantes"""
-    return load_submissions()
+# Note: All database functions are now in database.py
+# This keeps the code clean and modular
 
 # --- FUNCIONES DE AUTENTICACIÓN ---
 def register_page():
@@ -120,7 +52,7 @@ def register_page():
                 elif new_password != confirm_password:
                     st.error("Las contraseñas no coinciden")
                 else:
-                    success, message = register_user(new_username, new_password, new_name)
+                    success, message = db.register_user(new_username, new_password, new_name)
                     if success:
                         st.success(f"✅ {message}. Ahora puedes iniciar sesión")
                         st.balloons()
@@ -144,19 +76,18 @@ def login_page():
     with col2:
         st.subheader("🔐 Login")
         
-        users = load_users()
-        
         username = st.text_input("Usuario")
         password = st.text_input("Contraseña", type="password")
         
         col_btn1, col_btn2, col_btn3 = st.columns(3)
         with col_btn1:
             if st.button("Iniciar Sesión", use_container_width=True):
-                if username in users and users[username]["password"] == password:
+                user = db.authenticate_user(username, password)
+                if user:
                     st.session_state['logged_in'] = True
-                    st.session_state['username'] = username
-                    st.session_state['role'] = users[username]["role"]
-                    st.session_state['name'] = users[username]["name"]
+                    st.session_state['username'] = user['username']
+                    st.session_state['role'] = user['role']
+                    st.session_state['name'] = user['name']
                     st.rerun()
                 else:
                     st.error("Usuario o contraseña incorrectos")
@@ -334,7 +265,7 @@ if st.session_state['role'] == "teacher":
     with tab2:
         st.subheader("📊 Estadísticas de Estudiantes")
         
-        all_submissions = get_all_submissions()
+        all_submissions = db.get_all_submissions()
         
         if all_submissions:
             st.metric("Total de respuestas evaluadas", len(all_submissions))
@@ -349,7 +280,7 @@ if st.session_state['role'] == "teacher":
                 filtro_estudiante = st.selectbox("Filtrar por estudiante:", ["Todos"] + estudiantes)
             
             with col2:
-                filtro_resultado = st.selectbox("Filtrar por resultado:", ["Todos", "Correcta", "Incorrecta", "Dudosa"])
+                filtro_resultado = st.selectbox("Filtrar por resultado:", ["Todos", "Correcta", "Incorrecta", "Revisar"])
             
             # Aplicar filtros
             df_filtered = df_submissions.copy()
@@ -381,14 +312,14 @@ if st.session_state['role'] == "teacher":
                 total = len(student_data)
                 correctas = len([s for s in student_data if s['resultado'] == 'Correcta'])
                 incorrectas = len([s for s in student_data if s['resultado'] == 'Incorrecta'])
-                dudosas = len([s for s in student_data if s['resultado'] == 'Dudosa'])
+                revisar = len([s for s in student_data if s['resultado'] == 'Revisar'])
                 
                 with st.expander(f"📚 {estudiante} - {total} respuestas"):
                     col1, col2, col3, col4 = st.columns(4)
                     col1.metric("Total", total)
                     col2.metric("Correctas", correctas, delta=f"{(correctas/total*100):.0f}%")
                     col3.metric("Incorrectas", incorrectas)
-                    col4.metric("Dudosas", dudosas)
+                    col4.metric("Revisar", revisar)
         else:
             st.info("No hay respuestas de estudiantes aún.")
     
@@ -496,7 +427,7 @@ else:
                             "score": float(score),
                             "feedback": feedback_ia[:200] + "..." if len(feedback_ia) > 200 else feedback_ia
                         }
-                        save_submission(submission)
+                        db.save_submission(submission)
                         
                         st.rerun()
 
@@ -522,7 +453,7 @@ else:
     with tab2:
         st.subheader("📊 Tu Historial de Respuestas")
         
-        my_submissions = get_student_submissions(st.session_state['username'])
+        my_submissions = db.get_student_submissions(st.session_state['username'])
         
         if my_submissions:
             df_history = pd.DataFrame(my_submissions)
