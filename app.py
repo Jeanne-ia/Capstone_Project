@@ -9,6 +9,11 @@ from datetime import datetime
 # --- CONFIGURACIÓN DE PÁGINA ---
 st.set_page_config(page_title="EvalIA - App", layout="wide")
 
+col1, col2, col3 = st.columns([1, 1, 0.5])
+
+with col2:
+    st.image("ev3.png", width=200)
+
 # --- CSS ---
 st.markdown("""
 <style>
@@ -131,7 +136,7 @@ def register_page():
                 st.rerun()
 
 def login_page():
-    st.markdown("<h1 style='text-align: center;'>🎓 EvalIA - Sistema de Evaluación</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style='text-align: center;'>🎓 Sistema de Evaluación Continua</h1>", unsafe_allow_html=True)
     st.markdown("<p style='text-align: center;'>Inicia sesión para continuar</p>", unsafe_allow_html=True)
     
     col1, col2, col3 = st.columns([1, 2, 1])
