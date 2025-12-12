@@ -99,7 +99,7 @@ CREATE POLICY "Students can insert submissions"
 
 -- Insert default users
 INSERT INTO users (username, password, name, role) VALUES
-    ('teacher', 'teacher123', 'Profesor', 'teacher'),
+    ('teacher', 'teacher123', 'Docente', 'teacher'),
     ('student1', 'student123', 'Juan Pérez', 'student'),
     ('student2', 'student456', 'María García', 'student'),
     ('student3', 'student789', 'Carlos López', 'student')

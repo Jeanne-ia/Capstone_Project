@@ -154,9 +154,6 @@ if st.session_state['role'] == "teacher":
         # Sección de selección de preguntas
         if 'df_preguntas' in st.session_state and not st.session_state['df_preguntas'].empty:
             df = st.session_state['df_preguntas']
-            
-            print(df.columns)
-            print(df.head())
             preguntas_disponibles = df['QUESTION'].tolist()
             
             st.subheader("Control de Pregunta")
