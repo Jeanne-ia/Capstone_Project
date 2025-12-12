@@ -3,6 +3,7 @@ import pandas as pd
 import logica #Archivo con la lógica de EvalIA
 import ast
 from datetime import datetime
+import time
 
 # Import database functions
 import database as db
@@ -54,11 +55,12 @@ def register_page():
                 else:
                     success, message = db.register_user(new_username, new_password, new_name)
                     if success:
-                        st.success(f"✅ {message}. Ahora puedes iniciar sesión")
+                        st.success(f"✅ {message}. Redirigiendo al login...")
                         st.balloons()
-                        if st.button("Ir al Login"):
-                            st.session_state['show_register'] = False
-                            st.rerun()
+                        time.sleep(2)
+                        # Automatically redirect to login page
+                        st.session_state['show_register'] = False
+                        st.rerun()
                     else:
                         st.error(f"❌ {message}")
         
@@ -102,7 +104,7 @@ def login_page():
                 st.rerun()
         
         st.divider()
-        st.info("**Usuarios de prueba:**\n\n**Docente:** teacher / teacher123\n\n**Estudiantes:**\n- student1 / student123 (Juan)\n- student2 / student456 (María)\n- student3 / student789 (Carlos)\n\n**¿Eres nuevo?** Haz clic en 'Registrarse'")
+        st.info("**¿Eres nuevo?** Haz clic en 'Registrarse'")
 
 def logout():
     for key in list(st.session_state.keys()):
@@ -156,7 +158,7 @@ if st.session_state['role'] == "teacher":
             df = st.session_state['df_preguntas']
             preguntas_disponibles = df['QUESTION'].tolist()
             
-            st.subheader("Elije r")
+            st.subheader("Seleccione Pregunta:")
 
             pregunta_elegida_texto = st.selectbox(
                 "Seleccione una pregunta para evaluar:",
@@ -192,7 +194,7 @@ if st.session_state['role'] == "teacher":
             st.markdown(f"### {fila['QUESTION']}")
             
             with st.form("eval_form_teacher"):
-                respuesta_usuario = st.text_area("Prueba una respuesta:", height=150, placeholder="Escribe aquí para probar el sistema...")
+                respuesta_usuario = st.text_area("Validación del pensamiento crítico:", height=150, placeholder="Escribe aquí para probar el sistema...")
                 submitted = st.form_submit_button("📊 Evaluar Respuesta")
                 
             if submitted:
@@ -335,9 +337,9 @@ if st.session_state['role'] == "teacher":
 
 else:
     # ========== PERFIL ESTUDIANTE ==========
-    st.markdown("## 👨‍🎓 Panel del Estudiante")
+    st.markdown("## 👨‍🎓 Mi trayectoria de Aprendizaje")
     
-    tab1, tab2 = st.tabs(["📝 Responder Preguntas", "📊 Mi Historial"])
+    tab1, tab2 = st.tabs(["📝 Responder Preguntas", "📊 Reporte de logro de Destrezas"])
     
     with tab1:
         st.info("💡 Responde las preguntas para recibir feedback automático de la IA.")
@@ -440,7 +442,7 @@ else:
             else:
                 st.warning(f"🤔 Tu respuesta será **REVISADA** por el docente")
             
-            st.markdown("### 🤖 Feedback")
+            st.markdown("### 🤖 Guía Personalizada de Aprendizaje")
             st.info(res['feedback'])
             
             # Los estudiantes NO ven las métricas técnicas ni la respuesta de referencia
