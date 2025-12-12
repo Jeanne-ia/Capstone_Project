@@ -22,24 +22,55 @@ if 'df_preguntas' not in st.session_state:
     st.session_state['df_preguntas'] = logica.cargar_dataset()
 
 # --- HEADER ---
-st.title("🎓 EvalIA: Sistema de Evaluación Continua")
-st.markdown("Capstone Project | Evaluación automática de respuestas abiertas con **SBERT + Regresión Logística + GenAI**.")
+st.markdown("<h1 style='text-align: center;'>🎓 EvalIA: Sistema de Evaluación Continua</h1>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center;'>Capstone Project | Evaluación automática de respuestas abiertas con <strong>SBERT + Regresión Logística + GenAI</strong>.</p>", unsafe_allow_html=True)
 
 # --- BARRA LATERAL (SIDEBAR) ---
-with st.sidebar:
-    st.header("Control")
-    if st.button("🔄 Cargar Nueva Pregunta"):
-        if not st.session_state['df_preguntas'].empty:
-            sample = st.session_state['df_preguntas'].sample(1).iloc[0]
-            st.session_state['current_qid'] = sample['QUESTION_ID']
+# with st.sidebar:
+if 'df_preguntas' in st.session_state and not st.session_state['df_preguntas'].empty:
+    df = st.session_state['df_preguntas']
+    
+    # 2. Obtener la lista de preguntas (asumiendo que la columna se llama 'QUESTION_TEXT')
+    # Si tu columna se llama diferente (ej: 'pregunta'), cámbialo aquí.
+    print(df.columns)
+    print(df.head())
+    preguntas_disponibles = df['QUESTION'].tolist()
+    
+    st.header("Control de Pregunta")
+
+    # 3. Crear el Selectbox con los textos de las preguntas
+    pregunta_elegida_texto = st.selectbox(
+        "Seleccione una pregunta para evaluar:",
+        preguntas_disponibles,
+        # Establece la pregunta actualmente cargada como valor por defecto si existe
+        index=preguntas_disponibles.index(st.session_state.get('current_question_text', preguntas_disponibles[0]))
+        if 'current_question_text' in st.session_state and st.session_state['current_question_text'] in preguntas_disponibles
+        else 0
+    )
+
+    # 4. Lógica para actualizar el ID de la pregunta seleccionada
+    # Usamos el texto seleccionado para encontrar su QUESTION_ID correspondiente en el DataFrame
+    if pregunta_elegida_texto:
+        # Encuentra el QUESTION_ID asociado al texto elegido
+        selected_row = df[df['QUESTION'] == pregunta_elegida_texto].iloc[0]
+        selected_qid = selected_row['QUESTION_ID']
+        
+        # Guardamos el texto también para mantener el selectbox seleccionado
+        st.session_state['current_question_text'] = pregunta_elegida_texto
+        
+        # Solo actualizamos el estado si el ID ha cambiado
+        if st.session_state.get('current_qid') != selected_qid:
+            st.session_state['current_qid'] = selected_qid
             # Limpiamos resultados anteriores
             if 'last_result' in st.session_state: del st.session_state['last_result']
             st.rerun()
-        else:
-            st.error("Error: Dataset no cargado.")
-    
-    st.divider()
-    st.info("Este sistema asiste al profesor filtrando respuestas claras y marcando dudosas.")
+            
+else:
+    st.error("Error: El DataFrame de preguntas ('df_preguntas') no está cargado o está vacío.")
+
+st.divider()
+st.info("Este sistema asiste al profesor filtrando respuestas claras y marcando dudosas.")
+st.info("Este sistema asiste al profesor filtrando respuestas claras y marcando dudosas.")
 
 # --- CUERPO PRINCIPAL ---
 
