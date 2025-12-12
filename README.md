@@ -92,4 +92,4 @@ Las cuentas se guardan en `users.json`:
 2. **Nuevo usuario:** Haz clic en "Registrarse" y crea tu cuenta
 3. **Usuario existente:** Ingresa con tus credenciales
 4. Los estudiantes pueden responder preguntas
-5. El profesor puede ver todas las estadísticas en la pestaña "📊 Estadísticas"
+5. El docente puede ver todas las estadísticas en la pestaña "📊 Estadísticas"
