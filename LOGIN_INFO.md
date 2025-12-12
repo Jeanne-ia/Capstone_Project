@@ -16,7 +16,7 @@ Una vez registrado, podrás iniciar sesión inmediatamente con tus credenciales.
 
 ## Usuarios de Prueba
 
-### Profesor
+### Docente
 - **Usuario:** `teacher`
 - **Contraseña:** `teacher123`
 - **Permisos:** 
@@ -51,7 +51,7 @@ Una vez registrado, podrás iniciar sesión inmediatamente con tus credenciales.
 Las respuestas se guardan en `student_submissions.json` y son **persistentes**:
 
 ✅ Los datos se mantienen después de cerrar sesión
-✅ El profesor puede ver todas las respuestas de todos los estudiantes
+✅ El docente puede ver todas las respuestas de todos los estudiantes
 ✅ Cada estudiante solo ve sus propias respuestas
 ✅ Los datos sobreviven al reinicio de la aplicación
 
@@ -60,7 +60,7 @@ Las cuentas se guardan en `users.json`:
 
 ✅ Nuevos estudiantes pueden auto-registrarse
 ✅ Las credenciales se guardan de forma persistente
-✅ Solo los estudiantes pueden auto-registrarse (no profesores)
+✅ Solo los estudiantes pueden auto-registrarse (no docentes)
 
 ## 🚀 Cómo usar
 
@@ -68,4 +68,4 @@ Las cuentas se guardan en `users.json`:
 2. **Nuevo usuario:** Haz clic en "Registrarse" y crea tu cuenta
 3. **Usuario existente:** Ingresa con tus credenciales
 4. Los estudiantes pueden responder preguntas
-5. El profesor puede ver todas las estadísticas en la pestaña "📊 Estadísticas"
+5. El docente puede ver todas las estadísticas en la pestaña "📊 Estadísticas"

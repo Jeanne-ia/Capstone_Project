@@ -102,7 +102,7 @@ def login_page():
                 st.rerun()
         
         st.divider()
-        st.info("**Usuarios de prueba:**\n\n**Profesor:** teacher / teacher123\n\n**Estudiantes:**\n- student1 / student123 (Juan)\n- student2 / student456 (María)\n- student3 / student789 (Carlos)\n\n**¿Eres nuevo?** Haz clic en 'Registrarse'")
+        st.info("**Usuarios de prueba:**\n\n**Docente:** teacher / teacher123\n\n**Estudiantes:**\n- student1 / student123 (Juan)\n- student2 / student456 (María)\n- student3 / student789 (Carlos)\n\n**¿Eres nuevo?** Haz clic en 'Registrarse'")
 
 def logout():
     for key in list(st.session_state.keys()):
@@ -144,8 +144,8 @@ st.divider()
 
 # --- PERFILES DIFERENCIADOS ---
 if st.session_state['role'] == "teacher":
-    # ========== PERFIL PROFESOR ==========
-    st.markdown("## 👨‍🏫 Panel del Profesor")
+    # ========== PERFIL DOCENTE ==========
+    st.markdown("## 👨‍🏫 Panel del Docente")
     
     tab1, tab2, tab3 = st.tabs(["📝 Evaluar Preguntas", "📊 Estadísticas", "⚙️ Gestión"])
     
@@ -184,9 +184,9 @@ if st.session_state['role'] == "teacher":
             st.error("Error: El DataFrame de preguntas ('df_preguntas') no está cargado o está vacío.")
 
         st.divider()
-        st.info("🎯 Como profesor, puedes probar el sistema evaluando respuestas y viendo métricas detalladas.")
+        st.info("🎯 Como docente, puedes probar el sistema evaluando respuestas y viendo métricas detalladas.")
 
-        # CUERPO PRINCIPAL - Profesor
+        # CUERPO PRINCIPAL - Docente
         if st.session_state['current_qid']:
             df = st.session_state['df_preguntas']
             fila = df[df['QUESTION_ID'] == st.session_state['current_qid']].iloc[0]
@@ -249,7 +249,7 @@ if st.session_state['role'] == "teacher":
                 st.markdown("### 🤖 Feedback IA")
                 st.info(res['feedback'])
                 
-                with st.expander("Ver respuesta de referencia (Profesor)"):
+                with st.expander("Ver respuesta de referencia (Docente)"):
                     try:
                         refs = ast.literal_eval(res['referencia']) if isinstance(res['referencia'], str) else res['referencia']
                         st.write(refs[0] if isinstance(refs, list) and len(refs)>0 else str(refs))
@@ -441,7 +441,7 @@ else:
             elif res['interpretacion'] == 'Incorrecta':
                 st.error(f"❌ Tu respuesta necesita mejoras")
             else:
-                st.warning(f"🤔 Tu respuesta será **REVISADA** por el profesor")
+                st.warning(f"🤔 Tu respuesta será **REVISADA** por el docente")
             
             st.markdown("### 🤖 Feedback")
             st.info(res['feedback'])
