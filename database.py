@@ -181,7 +181,7 @@ def initialize_default_users():
     Call this once during setup
     """
     default_users = [
-        {"username": "teacher", "password": "teacher123", "name": "Profesor", "role": "teacher"},
+        {"username": "teacher", "password": "teacher123", "name": "Docente", "role": "teacher"},
         {"username": "student1", "password": "student123", "name": "Juan Pérez", "role": "student"},
         {"username": "student2", "password": "student456", "name": "María García", "role": "student"},
         {"username": "student3", "password": "student789", "name": "Carlos López", "role": "student"}
