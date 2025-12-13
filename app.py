@@ -194,7 +194,7 @@ if st.session_state['role'] == "teacher":
             st.markdown(f"### {fila['QUESTION']}")
             
             with st.form("eval_form_teacher"):
-                respuesta_usuario = st.text_area("Validación del pensamiento crítico:", height=150, placeholder="Escribe aquí para probar el sistema...", key=f"student_answer_{fila['QUESTION_ID']})
+                respuesta_usuario = st.text_area("Validación del pensamiento crítico:", height=150, placeholder="Escribe aquí para probar el sistema...", key=f"student_answer_{fila['QUESTION_ID']}")
                 submitted = st.form_submit_button("📊 Evaluar Respuesta")
                 
             if submitted:
@@ -381,7 +381,7 @@ else:
                 st.write(fila["HINT"])
             
             with st.form("eval_form_student"):
-                respuesta_usuario = st.text_area("Validación del pensamiento crítico:", height=150, placeholder="Escribe aquí tu explicación...", key=f"student_answer_{fila['QUESTION_ID']})
+                respuesta_usuario = st.text_area("Validación del pensamiento crítico:", height=150, placeholder="Escribe aquí tu explicación...", key=f"student_answer_{fila['QUESTION_ID']}")
                 submitted = st.form_submit_button("📤 Enviar Respuesta")
                 
             if submitted:
